@@ -1,0 +1,14 @@
+# Build output
+bin/
+obj/
+dist/
+packages/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Reference assemblies - Decal's and Virindi's, not ours to redistribute.
+# See reference-only/README.txt for how to supply them.
+reference-only/*.dll

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProjectGuid>{B7E0F3A2-5C1D-4E8A-9F60-3D2A6C8E1B47}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DreamweaveMarket</RootNamespace>
+    <AssemblyName>DreamweaveMarket</AssemblyName>
+    <!-- 4.8 rather than 4.0: Visual Studio 2022 ships no targeting pack older than 4.7.2, so a
+         v4.0 project fails with MSB3644 on a machine that is otherwise able to build it. The
+         client runs everything on the same CLR (v4.0.30319) either way. -->
+    <TargetFrameworkVersion Condition=" '$(TargetFrameworkVersion)' == '' ">v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+
+    <!-- Reference assemblies ship in reference-only\, so this builds with no local install. They
+         are for compiling against and must never be copied into the game or plugin folders.
+         Point at your own Decal instead if you hit CS0012 about Decal.Interop.Filters:
+         msbuild /p:DecalPath="C:\Games\Decal 3.0\" /p:VVSPath="C:\Games\VirindiPlugins\VirindiViewService\"
+         build.bat does this for you when it finds Decal installed. -->
+    <DecalPath Condition=" '$(DecalPath)' == '' ">reference-only\</DecalPath>
+    <VVSPath Condition=" '$(VVSPath)' == '' ">reference-only\</VVSPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;VVS_REFERENCED</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE;VVS_REFERENCED</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="Decal.Adapter">
+      <HintPath>$(DecalPath)Decal.Adapter.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="VirindiViewService">
+      <HintPath>$(VVSPath)VirindiViewService.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The embedded browser. Restored from NuGet, so the first build needs a network connection
+         and an MSBuild that can restore (Visual Studio's, not the bare .NET Framework one). -->
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2792.45" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="PluginCore.cs" />
+    <Compile Include="MarketView.cs" />
+    <Compile Include="Globals.cs" />
+    <Compile Include="BrowserHost.cs" />
+    <Compile Include="MarketForm.cs" />
+    <Compile Include="WebViewEnvironment.cs" />
+    <Compile Include="MarketBrowser.cs" />
+    <Compile Include="OffscreenBrowser.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="Util.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Must stay embedded resources: MVView loads the XML by resource name, and the icon is read
+         out of the assembly at startup. Renaming either file means changing the name used in
+         PluginCore.cs. -->
+    <EmbeddedResource Include="mainView.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\icon.png" />
+    <None Include="Resources\icon-source-256.png" />
+    <None Include="build.bat" />
+    <None Include="README.md" />
+    <None Include="CHANGELOG.md" />
+  </ItemGroup>
+
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
+  <!--
+    Renames the built DLL to carry its own version: DreamweaveMarket-1.0.2.dll.
+
+    The version is read back out of the assembly that was just built rather than repeated here, so
+    there is one place to change it - Properties\AssemblyInfo.cs - and no way for the file name to
+    claim a version the DLL does not have.
+
+    The plain DreamweaveMarket.dll is deleted rather than left beside it: two copies of the same
+    plugin in one folder is how you end up registering both and getting everything twice.
+  -->
+  <Target Name="StampVersionOnFileName" AfterTargets="Build">
+    <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
+      <Output TaskParameter="Assemblies" ItemName="_BuiltAssembly" />
+    </GetAssemblyIdentity>
+
+    <PropertyGroup>
+      <_FullVersion>%(_BuiltAssembly.Version)</_FullVersion>
+      <_ShortVersion>$([System.Version]::Parse('$(_FullVersion)').ToString(3))</_ShortVersion>
+      <_VersionedPath>$(TargetDir)$(AssemblyName)-$(_ShortVersion).dll</_VersionedPath>
+    </PropertyGroup>
+
+    <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(_VersionedPath)" />
+    <Delete Files="$(TargetPath)" />
+
+    <Message Importance="high" Text="  built $(_VersionedPath)" />
+  </Target>
+</Project>

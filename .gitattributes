@@ -1,0 +1,14 @@
+# This is a Windows-only project and everything in it is checked out with CRLF.
+#
+# build.bat especially: cmd cannot find a label in a batch file with Unix line
+# endings, so `goto :fail` falls off the end of the script and the window closes
+# instantly with nothing printed. That is not a hypothetical - it happened, and
+# it took a version to work out.
+* text=auto eol=crlf
+*.bat text eol=crlf
+
+*.png binary
+*.dll binary
+*.ico binary
+*.7z binary
+*.zip binary

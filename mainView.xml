@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<!-- The window Virindi View Service builds for this plugin. Its presence is what puts
+     DreamweaveMarket in the VVS bar: VVS lists the views registered with it, so a plugin with no
+     view has nothing to list.
+
+     Two pages. "Market" is deliberately almost empty - at runtime a VVS HudBrowser is added to
+     marketPage and sized to fill it, which is the in-game rendering path (see MarketBrowser.cs).
+     MarketNotice is the message shown in its place when that is not possible. The wrappers know
+     nothing about HudBrowser, so it cannot be declared here and has to be added in code.
+
+     There is deliberately NO icon attribute. That attribute takes a portal.dat icon id, and the
+     wrappers turn it into an ACImage that holds an icon id and no bitmap. VVS's own bar cannot
+     cope with one of those: when it rebuilds - which happens whenever any plugin's window is
+     added or removed, not just ours - it calls ACImage.Clone() on every icon it holds, and Clone
+     does new Bitmap(BitmapImage) unconditionally. For an icon-id ACImage that argument is null,
+     so it throws NullReferenceException from inside VVS and takes the bar, and every plugin
+     docked in it, down with it - at some unrelated moment, in someone else's stack trace.
+
+     So the icon is only ever set in code, from a real bitmap: see PluginCore.ApplyCustomIcon,
+     which also falls back to a generated bitmap rather than to an icon id. -->
+<view title="Dreamweave Market" width="640" height="480">
+  <control progid="DecalControls.Notebook" name="MainTabs">
+
+    <page label="Market">
+      <control progid="DecalControls.FixedLayout" clipped="" name="marketPage">
+        <control progid="DecalControls.StaticText" name="MarketNotice"
+                 left="8" top="8" width="600" height="60"
+                 text="Starting the in-game browser..." />
+      </control>
+    </page>
+
+    <page label="Settings">
+      <control progid="DecalControls.FixedLayout" clipped="" name="controlsPage">
+
+        <control progid="DecalControls.PushButton" name="OpenButton"
+                 left="8" top="10" width="240" height="26" text="Open Market" />
+
+        <control progid="DecalControls.PushButton" name="ReloadButton"
+                 left="8" top="42" width="116" height="24" text="Reload" />
+
+        <control progid="DecalControls.PushButton" name="ExternalButton"
+                 left="132" top="42" width="116" height="24" text="Open in browser" />
+
+        <control progid="DecalControls.StaticText" name="ModeLabel"
+                 left="8" top="78" width="300" height="16" text="Show the market:" />
+
+        <!-- Two checkboxes used as radio buttons: VVS has no radio control, and a pair of
+             checkboxes that keep each other exclusive reads better than a button that cycles,
+             where the label has to explain which way the cycle goes. Kept exclusive in
+             PluginCore.ModeBox_Change. -->
+        <control progid="DecalControls.CheckBox" name="ModeInGame"
+                 left="10" top="98" width="120" height="18" text="In Game" />
+
+        <control progid="DecalControls.CheckBox" name="ModeWindow"
+                 left="134" top="98" width="200" height="18" text="Pop Out Window" />
+
+        <control progid="DecalControls.StaticText" name="ZoomLabel"
+                 left="8" top="128" width="110" height="16" text="Zoom: 80%" />
+
+        <control progid="DecalControls.PushButton" name="ZoomOut"
+                 left="118" top="126" width="30" height="20" text="-" />
+
+        <control progid="DecalControls.PushButton" name="ZoomIn"
+                 left="152" top="126" width="30" height="20" text="+" />
+
+        <control progid="DecalControls.PushButton" name="ZoomReset"
+                 left="186" top="126" width="56" height="20" text="100%" />
+
+        <control progid="DecalControls.CheckBox" name="AlwaysOnTop"
+                 left="10" top="156" width="300" height="18"
+                 text="Keep the Pop Out Window above the game" />
+
+      </control>
+    </page>
+
+    <page label="About">
+      <control progid="DecalControls.FixedLayout" clipped="" name="aboutPage">
+
+        <control progid="DecalControls.StaticText" name="AboutTitle"
+                 left="10" top="14" width="400" height="18" text="Dreamweave Market" />
+
+        <control progid="DecalControls.StaticText" name="AboutVersion"
+                 left="10" top="38" width="400" height="16" text="" />
+
+        <control progid="DecalControls.StaticText" name="AboutBy"
+                 left="10" top="70" width="400" height="16"
+                 text="Designed by Rez (Mostly Claude)" />
+
+        <control progid="DecalControls.StaticText" name="AboutSite"
+                 left="10" top="94" width="400" height="16"
+                 text="market.acdreamweave.com" />
+
+        <control progid="DecalControls.StaticText" name="AboutFeedback"
+                 left="10" top="126" width="520" height="16"
+                 text="Feedback and bug reports: post in the AC:DW Discord" />
+
+      </control>
+    </page>
+
+  </control>
+</view>
