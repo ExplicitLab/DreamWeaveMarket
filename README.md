@@ -1,4 +1,12 @@
 # DreamweaveMarket
+## Download
+
+**[Download the latest release](https://github.com/ExplicitLab/DreamWeaveMarket/releases/latest)**
+
+Unzip somewhere permanent, then add the `DreamweaveMarket-<version>.dll` through the
+Decal Agent's **Plugins > Add**. Instructions are in `INSTALL.txt` inside the zip.
+
+
 
 A Decal plugin for Asheron's Call that shows <https://market.acdreamweave.com> either **inside the
 game** or in a pop-out window on top of it, or a quick access button to load your default browser and load the page
