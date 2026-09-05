@@ -18,7 +18,7 @@ game** or in a pop-out window on top of it, or a quick access button to load you
 
 ![Settings page](Screenshots/market2.png)
 
-![PopUp Window](Screenshots/market2.png)
+![PopUp Window](Screenshots/market3.png)
 
 
 | Mode | What it does |
