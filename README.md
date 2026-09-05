@@ -12,6 +12,13 @@ A Decal plugin for Asheron's Call that shows <https://market.acdreamweave.com> e
 game** or in a pop-out window on top of it, or a quick access button to load your default browser and load the page
 
 ![icon](Resources/icon-source-256.png)
+## Screenshots
+
+![The market rendered in-game](Screenshots/market1.png)
+
+![Settings page](Screenshots/market2.png)
+
+![PopUp Window](Screenshots/market2.png)
 
 
 | Mode | What it does |
